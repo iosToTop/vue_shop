@@ -83,7 +83,12 @@ export default {
         // 发起登录的请求 { data: res} 去返回数据中的data 赋值给res
         const { data: res } = await this.$http.post('login', this.formData)
         if (parseInt(res.meta.status) !== 200) {
-          this.$message.error = '登录失败,请检查'
+          this.$message.error(res.meta.msg)
+        } else {
+          // login suc,save the user token
+          localStorage.setItem('token', res.data.token)
+          this.$message.success(res.meta.msg)
+          this.$router.push({ name: 'home' })
         }
       })
     },

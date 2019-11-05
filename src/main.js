@@ -4,27 +4,16 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import elementUI from 'element-ui'
-import axios from 'axios'
+import myHttpServer from '@/plugins/http'
 import 'element-ui/lib/theme-chalk/index.css'
 import '@/assets/css/reset.css'
 import '@/assets/css/iconfont.css'
-
-// 为axios请求头添加token
-axios.interceptors.request.use(config => {
-  config.headers.Authorization = window.sessionStorage.getItem('token')
-  return config
-})
-
-// axios全局挂载Url
-axios.defaults.baseURL = 'http://39.108.193.251:8888/api/private/v1/'
-
-// 为全局Vue添加属性成员
-Vue.prototype.$http = axios
 
 Vue.productionTip = false
 
 // 使用Vue插件
 Vue.use(elementUI)
+Vue.use(myHttpServer)
 
 Vue.config.productionTip = false
 
