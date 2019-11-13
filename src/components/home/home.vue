@@ -15,8 +15,8 @@
     </el-header>
 
     <el-container>
-      <el-aside width="15%" class="leftNav">
-        <el-menu :unique-opened="true">
+      <el-aside width="20%" class="leftNav">
+        <el-menu :unique-opened="true" :router="true">
           <el-submenu
             v-for="(submenus, index) in leftItem"
             :index="String(index + 1)"
@@ -28,7 +28,7 @@
             </template>
             <el-menu-item
               v-for="(item, subIndex) in submenus.sub"
-              :index="(index + 1) + '-' + (subIndex + 1)"
+              :index="item.name"
               :key="subIndex"
             >
               <i :class="item.icon"></i>
@@ -38,8 +38,7 @@
         </el-menu>
       </el-aside>
       <el-main class="show">
-        <!-- Main content -->
-        Body
+        <router-view></router-view>
       </el-main>
     </el-container>
   </el-container>
@@ -61,7 +60,7 @@ export default {
         {
           title: '用户管理',
           icon: 'el-icon-user-solid',
-          sub: [{ title: '用户列表', icon: 'el-icon-price-tag' }]
+          sub: [{ title: '用户列表', icon: 'el-icon-price-tag', name: 'users' }]
         },
         {
           title: '权限管理',
@@ -69,7 +68,11 @@ export default {
           sub: [
             { title: '用户列表', icon: 'el-icon-price-tag' },
             { title: '角色列表', icon: 'el-icon-price-tag' },
-            { title: '权限列表', icon: 'el-icon-price-tag' }
+            {
+              title: '权限列表',
+              icon: 'el-icon-price-tag',
+              name: 'permissions'
+            }
           ]
         },
         {
