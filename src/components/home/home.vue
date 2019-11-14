@@ -66,8 +66,7 @@ export default {
           title: '权限管理',
           icon: 'el-icon-s-flag',
           sub: [
-            { title: '用户列表', icon: 'el-icon-price-tag' },
-            { title: '角色列表', icon: 'el-icon-price-tag' },
+            { title: '角色列表', icon: 'el-icon-price-tag', name: 'roles' },
             {
               title: '权限列表',
               icon: 'el-icon-price-tag',
