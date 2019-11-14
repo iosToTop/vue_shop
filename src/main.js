@@ -10,6 +10,12 @@ import '@/assets/css/reset.css'
 import '@/assets/css/iconfont.css'
 import moment from 'moment'
 
+// fundebug bug测试工具
+import * as fundebug from 'fundebug-javascript'
+import fundebugVue from 'fundebug-vue'
+fundebug.apikey = 'a4ca737fba41d230d1869482c6ccd8860c5598fcc8b274d59efc69bfc46f0ab8'
+fundebugVue(fundebug, Vue)
+
 Vue.productionTip = false
 
 // 使用Vue插件

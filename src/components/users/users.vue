@@ -36,7 +36,7 @@
       <el-table-column label="用户状态" width="100">
         <!-- 组件内容中使用其他组件用template包裹 -->
         <template slot-scope="scope">
-          <el-switch v-model="scope.row.mg_state"></el-switch>
+          <el-switch v-model="scope.row.mg_state" @change="userStatusChange(scope.row)"></el-switch>
         </template>
       </el-table-column>
 
@@ -132,6 +132,32 @@
         <el-form-item>
           <el-button type="primary" size="medium" @click="editUserDiaSure()">立即修改</el-button>
           <el-button size="medium" @click="editUserDiaCancel()">取消</el-button>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
+
+    <!-- 分配角色对话框 -->
+    <el-dialog title="分配角色" :visible.sync="dialogControl.assignUserDia" width="40%">
+      <el-form ref="assignUserForm" :model="assignUserDataForm" label-width="80px">
+        <el-form-item prop="username" label="用户名">
+          <el-input disabled v-model="assignUserDataForm.username"></el-input>
+        </el-form-item>
+        <el-form-item label="角色">
+          <el-select v-model="assignUserDataForm.role_id" placeholder="选择角色">
+            <el-option disabled label="请选择" :value="-1"></el-option>
+
+            <el-option
+              v-for="(item,i) in assignUserDataForm.userRoleList"
+              :key="i"
+              :label="item.roleName"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item>
+          <el-button type="primary" size="medium" @click="assignUserDiaSure()">立即分配</el-button>
+          <el-button size="medium" @click="assignUserDiaCancel()">取消</el-button>
         </el-form-item>
       </el-form>
     </el-dialog>

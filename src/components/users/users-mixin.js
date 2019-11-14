@@ -119,7 +119,8 @@ export default {
       // 对话框控制
       dialogControl: {
         addUserDia: false,
-        editUserDia: false
+        editUserDia: false,
+        assignUserDia: false
       },
       addUserDataForm: {
         username: '',
@@ -132,16 +133,57 @@ export default {
         username: '',
         email: '',
         mobile: ''
+      },
+      // 分配角色数据
+      assignUserDataForm: {
+        userRoleList: [],
+        username: '',
+        email: '',
+        id: '',
+        role_name: '',
+        role_id: ''
       }
     }
   },
   methods: {
+    // 确定/取消分配角色对话框
+    async assignUserDiaSure() {
+      const { data: res } = await this.$http.put(`users/${this.assignUserDataForm.id}/role`, {
+        rid: this.assignUserDataForm.role_name
+      })
+      let setRoleName = ''
+      this.assignUserDataForm.userRoleList.map(item => {
+        if (item.id === this.assignUserDataForm.role_name) {
+          setRoleName = item.roleName
+        }
+      })
+      if (res.meta.status === 200) {
+        this.$message.success(`${this.assignUserDataForm.username} 已设置为 ${setRoleName}`)
+        // 刷新用户数据
+        this.getUsersData()
+      } else {
+        this.$message.error(`设置失败,请重试`)
+      }
+      this.dialogControl.assignUserDia = false
+    },
+    assignUserDiaCancel() {
+      this.dialogControl.assignUserDia = false
+    },
+    // 修改用户状态
+    async userStatusChange(user) {
+      const { data: res } = await this.$http.put(`users/${user.id}/state/${user.mg_state}`)
+      const turnNoti = user.mg_state === true ? '打开' : '关闭'
+      if (res.meta.status === 200) {
+        this.$message.success(`${turnNoti} ${user.username} 成功`)
+      } else {
+        this.$message.error(`${turnNoti} ${user.username} 失败`)
+      }
+    },
     // 立即修改
     editUserDiaSure() {
       this.$refs.editUserForm.validate(async valid => {
         if (!valid) return
         const { data: res } = await this.$http.put('users/' + this.editUserDataForm.id, { email: this.editUserDataForm.email, mobile: this.editUserDataForm.mobile })
-        console.log(`编辑: ${JSON.stringify(res)}`)
         if (res.meta.status === 200) {
           this.getUsersData()
           this.$message.success(`修改 ${this.editUserDataForm.username} 资料成功`)
@@ -175,9 +217,7 @@ export default {
       })
     },
     async postDeleteUser(userID, userName) {
-      console.log('删除Id', userID)
       const { data: res } = await this.$http.delete('users/' + userID)
-      console.log(res)
       if (res.meta.status === 200) {
         this.$message.success(`删除 ${userName} 成功!`)
         this.getUsersData()
@@ -197,14 +237,40 @@ export default {
     },
     // 检查按钮点击
     checkClick(user) {
+      console.log(user)
+      this.getUserRoleList(user)
+      this.dialogControl.assignUserDia = true
+      this.assignUserDataForm = {
+        username: user.username,
+        id: user.id,
+        role_name: user.role_name
+      }
+    },
+    async getUserRoleList(user) {
+      const { data: res } = await this.$http.get('roles')
 
+      const roleDataList = res.data
+      let userRoleId
+      let roleList = []
+      roleDataList.map(item => {
+        if (item.roleName === user.role_name) {
+          userRoleId = item.id
+        }
+        const roleItem = {
+          id: item.id,
+          roleName: item.roleName
+        }
+        roleList.push(roleItem)
+      })
+      // 使用$set设置,否则监听不到数据变化,视图不会刷新
+      this.$set(this.assignUserDataForm, 'userRoleList', roleList)
+      this.$set(this.assignUserDataForm, 'role_id', userRoleId)
     },
     addUserDiaCancel() {
       this.dialogControl.addUserDia = false
     },
     async addUserDiaSure() {
       this.$refs.addUserForm.validate(async valid => {
-        console.log('校检结果', valid)
         if (!valid) return
         const { data: res } = await this.$http.post(
           'users',
@@ -242,7 +308,6 @@ export default {
       this.userTableData = users
       this.queryinfo.pagenum = pagenum
       this.queryinfo.totalnum = total
-      console.log(usersData)
     },
     addUser() {
       this.dialogControl.addUserDia = true
