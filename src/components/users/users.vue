@@ -1,10 +1,6 @@
 <template>
   <el-card class="cardContainer">
-    <el-breadcrumb separator="/">
-      <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>用户管理</el-breadcrumb-item>
-      <el-breadcrumb-item>用户列表</el-breadcrumb-item>
-    </el-breadcrumb>
+    <hh-bread pathNameList="首页,用户管理,用户列表" toList="home"></hh-bread>
 
     <!-- 搜索框 -->
     <div class="input-div">
@@ -143,7 +139,7 @@
           <el-input disabled v-model="assignUserDataForm.username"></el-input>
         </el-form-item>
         <el-form-item label="角色">
-          <el-select v-model="assignUserDataForm.role_id" placeholder="选择角色">
+          <el-select v-model="assignUserDataForm.role_name" placeholder="选择角色">
             <el-option disabled label="请选择" :value="-1"></el-option>
 
             <el-option
@@ -192,7 +188,6 @@ export default {
   .user-table {
     margin-top: 20px;
     text-align: center;
-    height: 100%;
 
     :first-child {
       text-align: center;

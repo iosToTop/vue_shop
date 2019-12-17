@@ -151,6 +151,7 @@ export default {
       const { data: res } = await this.$http.put(`users/${this.assignUserDataForm.id}/role`, {
         rid: this.assignUserDataForm.role_name
       })
+      console.log(res)
       let setRoleName = ''
       this.assignUserDataForm.userRoleList.map(item => {
         if (item.id === this.assignUserDataForm.role_name) {

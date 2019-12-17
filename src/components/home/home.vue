@@ -16,23 +16,23 @@
 
     <el-container>
       <el-aside width="20%" class="leftNav">
-        <el-menu :unique-opened="true" :router="true">
+        <el-menu unique-opened router>
           <el-submenu
-            v-for="(submenus, index) in leftItem"
-            :index="String(index + 1)"
-            :key="submenus.title"
+            v-for="submenus in leftItem"
+            :index="''+submenus.order"
+            :key="submenus.authName"
           >
             <template slot="title">
               <i :class="submenus.icon"></i>
-              {{submenus.title}}
+              {{submenus.authName}}
             </template>
             <el-menu-item
-              v-for="(item, subIndex) in submenus.sub"
-              :index="item.name"
+              v-for="(item, subIndex) in submenus.children"
+              :index="item.path"
               :key="subIndex"
             >
               <i :class="item.icon"></i>
-              {{item.title}}
+              {{item.authName}}
             </el-menu-item>
           </el-submenu>
         </el-menu>
@@ -46,57 +46,82 @@
 
 <script>
 export default {
-  // 渲染组件前,判断是否有保存的token
-  beforeCreate() {
-    const token = localStorage.getItem('token')
-    // 如果没有token,则让用户重新登录
-    if (!token) {
-      this.$router.push({ name: 'login' })
-    }
+  created() {
+    this.getLeftMenus()
   },
   data() {
     return {
       leftItem: [
         {
-          title: '用户管理',
+          authName: '用户管理123',
           icon: 'el-icon-user-solid',
-          sub: [{ title: '用户列表', icon: 'el-icon-price-tag', name: 'users' }]
+          children: [
+            { authName: '用户列表', icon: 'el-icon-price-tag', path: 'users' }
+          ]
         },
         {
-          title: '权限管理',
+          authName: '权限管理',
           icon: 'el-icon-s-flag',
-          sub: [
-            { title: '角色列表', icon: 'el-icon-price-tag', name: 'roles' },
+          children: [
+            { authName: '角色列表', icon: 'el-icon-price-tag', path: 'roles' },
             {
-              title: '权限列表',
+              authName: '权限列表',
               icon: 'el-icon-price-tag',
-              name: 'permissions'
+              path: 'permissions'
             }
           ]
         },
         {
-          title: '商品管理',
+          authName: '商品管理',
           icon: 'el-icon-goods',
-          sub: [
-            { title: '商品列表', icon: 'el-icon-price-tag' },
-            { title: '分类参数', icon: 'el-icon-price-tag' },
-            { title: '商品分类', icon: 'el-icon-price-tag' }
+          children: [
+            { authName: '商品列表', icon: 'el-icon-price-tag', path: 'shop' },
+            { authName: '分类参数', icon: 'el-icon-price-tag' },
+            { authName: '商品分类', icon: 'el-icon-price-tag' }
           ]
         },
         {
-          title: '订单管理',
+          authName: '订单管理',
           icon: 'el-icon-data-board',
-          sub: [{ title: '订单列表', icon: 'el-icon-price-tag' }]
+          children: [{ authName: '订单列表', icon: 'el-icon-price-tag' }]
         },
         {
-          title: '数据统计',
+          authName: '数据统计',
           icon: 'el-icon-orange',
-          sub: [{ title: '数据报表', icon: 'el-icon-price-tag' }]
+          children: [{ authName: '数据报表', icon: 'el-icon-price-tag' }]
         }
       ]
     }
   },
   methods: {
+    async getLeftMenus() {
+      const { data: res } = await this.$http('menus')
+      if (res.meta.status !== 200) {
+        return this.$message.error('获取导航菜单数据失败')
+      }
+
+      let x = 0
+      let navArr = []
+      res.data.map(resItem => {
+        let item = this.leftItem[x]
+        let tempChildren = [...item.children]
+        Object.assign(item, resItem)
+        if (resItem.children.length > 0 && tempChildren.length > 0) {
+          let y = 0
+          let arr = []
+          tempChildren.map(item1 => {
+            Object.assign(item1, resItem.children[y])
+            arr.push(item1)
+            y++
+          })
+          item.children = arr
+        }
+        navArr.push(item)
+        x++
+      })
+      this.leftItem = navArr
+      console.log(`结构后:`, this.leftItem)
+    },
     exitHome() {
       // clear token
       localStorage.clear()
